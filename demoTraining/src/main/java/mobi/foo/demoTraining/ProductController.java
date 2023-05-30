@@ -1,5 +1,6 @@
 package mobi.foo.demoTraining;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class ProductController {
     }
 
     @PostMapping("/add")
-    public Product createProduct(@RequestBody Product product) {
+    public Product createProduct(@RequestBody  @Valid Product product) {
         return productService.save(product);
     }
 
