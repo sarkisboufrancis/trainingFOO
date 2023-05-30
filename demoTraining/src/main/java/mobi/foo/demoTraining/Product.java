@@ -17,5 +17,8 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    private String hide;
+
+
 }
 
