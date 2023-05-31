@@ -1,6 +1,7 @@
 package mobi.foo.demoTraining;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -17,6 +18,7 @@ public class Product {
     private Long Id;
 
     @Column(nullable = false)
+    @DecimalMin(value = "0.0")
     private double price;
 
     @Column(nullable = false)
