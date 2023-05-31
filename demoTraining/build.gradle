@@ -26,6 +26,7 @@ dependencies {
 	implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'io.lettuce:lettuce-core'
+	implementation group: 'redis.clients', name: 'jedis', version: '5.0.0-beta1'
 }
 
 tasks.named('test') {

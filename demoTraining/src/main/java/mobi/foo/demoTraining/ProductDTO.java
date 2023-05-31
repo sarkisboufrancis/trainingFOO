@@ -1,5 +1,7 @@
 package mobi.foo.demoTraining;
 
-public record ProductDTO(Long id,String name , Double price) {
+import java.io.Serializable;
+
+public record ProductDTO(Long id, String name , Double price) implements Serializable {
 
 }
