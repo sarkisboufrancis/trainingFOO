@@ -16,6 +16,7 @@ public class ProductService {
     private final ProductDTOMapper productDTOMapper;
     private final RedisTemplate<String, Object> redisTemplate;
 
+    @Async
     public CompletableFuture<List<ProductDTO>> findAll() {
         List<ProductDTO> cacheProducts = (List<ProductDTO>) redisTemplate.opsForValue().get("products");
         if (cacheProducts != null && !cacheProducts.isEmpty()) {
