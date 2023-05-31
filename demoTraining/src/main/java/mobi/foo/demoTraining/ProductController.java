@@ -18,7 +18,7 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public List<ProductDTO> getAllProducts() {
+    public CompletableFuture<List<ProductDTO>> getAllProducts() {
         return productService.findAll();
     }
 

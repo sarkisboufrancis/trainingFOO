@@ -16,16 +16,16 @@ public class ProductService {
     private final ProductDTOMapper productDTOMapper;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public List<ProductDTO> findAll() {
+    public CompletableFuture<List<ProductDTO>> findAll() {
         List<ProductDTO> cacheProducts = (List<ProductDTO>) redisTemplate.opsForValue().get("products");
         if (cacheProducts != null && !cacheProducts.isEmpty()) {
             System.out.println("we used the cache" + cacheProducts);
-            return cacheProducts;
+            return CompletableFuture.completedFuture(cacheProducts);
         }
         List<ProductDTO> allProducts = productRepository.findAll().stream().map(productDTOMapper).collect(Collectors.toList());
         redisTemplate.opsForValue().set("products", allProducts);
         System.out.println("we used database");
-        return allProducts;
+        return CompletableFuture.completedFuture(allProducts);
     }
 
     @Async
