@@ -2,11 +2,12 @@ package mobi.foo.demoTraining;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -27,30 +28,35 @@ public class ProductService {
         return allProducts;
     }
 
-    public Optional<ProductDTO> findById(Long id) {
+    @Async
+    public CompletableFuture<Optional<ProductDTO>> findByIdAsync(Long id) throws InterruptedException {
         String cacheKey = "product_" + id;
         ProductDTO cachedProduct = (ProductDTO) redisTemplate.opsForValue().get(cacheKey);
         if (cachedProduct != null) {
             System.out.println("We used the cache for product ID: " + id);
-            return Optional.of(cachedProduct);
+            Thread.sleep(1000);
+            return CompletableFuture.completedFuture(Optional.of(cachedProduct));
         }
         Optional<Product> product = productRepository.findById(id);
         Optional<ProductDTO> productDTO = product.map(productDTOMapper);
         productDTO.ifPresent(p -> redisTemplate.opsForValue().set(cacheKey, p));
         System.out.println("We used the database for product ID: " + id);
-        return productDTO;
+        return CompletableFuture.completedFuture(productDTO);
     }
 
-    public Product save(Product product) {
+    @Async
+    public CompletableFuture<Product> saveAsync(Product product) {
         Product savedProduct = productRepository.save(product);
         redisTemplate.delete("products"); // Clear the products cache
         redisTemplate.delete("product_" + savedProduct.getId()); // Clear the specific product cache
-        return savedProduct;
+        return CompletableFuture.completedFuture(savedProduct);
     }
 
-    public void delete(Long id) {
+    @Async
+    public CompletableFuture<Void> deleteAsync(Long id) {
         productRepository.deleteById(id);
         redisTemplate.delete("products"); // Clear the products cache
         redisTemplate.delete("product_" + id); // Clear the specific product cache
+        return CompletableFuture.completedFuture(null);
     }
 }

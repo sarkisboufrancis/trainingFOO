@@ -1,5 +1,6 @@
 package mobi.foo.demoTraining;
 
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/products")
@@ -21,24 +23,28 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public Optional<ProductDTO> getProductById(@PathVariable("id") Long id) {
-        return productService.findById(id);
+    public CompletableFuture<ResponseEntity<ProductDTO>> getProductById(@PathVariable("id") Long id) throws InterruptedException {
+        return productService.findByIdAsync(id)
+                .thenApply(productDTO -> productDTO.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build()));
     }
 
     @PostMapping("/add")
-    public Product createProduct(@RequestBody  @Valid Product product) {
-        return productService.save(product);
+    public CompletableFuture<Product> createProduct(@RequestBody @Valid Product product) {
+        return productService.saveAsync(product);
     }
 
     @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable("id") Long id, @RequestBody Product product) {
+    public CompletableFuture<ResponseEntity<Product>> updateProduct(@PathVariable("id") Long id, @RequestBody Product product) {
         product.setId(id);
-        return productService.save(product);
+        return productService.saveAsync(product)
+                .thenApply(ResponseEntity::ok)
+                .exceptionally(e -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long id) {
-        productService.delete(id);
-        return ResponseEntity.noContent().build();
+    public CompletableFuture<ResponseEntity<Void>> deleteProduct(@PathVariable("id") Long id) {
+        return productService.deleteAsync(id)
+                .thenApply(ignore -> ResponseEntity.noContent().build());
     }
 }
+
