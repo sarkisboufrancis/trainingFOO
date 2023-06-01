@@ -27,6 +27,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'io.lettuce:lettuce-core'
 	implementation group: 'redis.clients', name: 'jedis', version: '5.0.0-beta1'
+	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0"
 }
 
 tasks.named('test') {
