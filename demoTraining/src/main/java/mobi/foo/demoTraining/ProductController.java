@@ -7,12 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/Api/v1/products")
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -20,7 +18,7 @@ public class ProductController {
 
     @GetMapping
     @Operation(summary = "Get  all product")
-    public CompletableFuture<List<ProductDTO>> getAllProducts() {
+    public ResponseEntity<FooResponse> getAllProducts() {
         return productService.findAll();
     }
 

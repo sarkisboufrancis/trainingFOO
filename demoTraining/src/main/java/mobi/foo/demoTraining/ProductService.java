@@ -2,6 +2,8 @@ package mobi.foo.demoTraining;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -17,16 +19,19 @@ public class ProductService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Async
-    public CompletableFuture<List<ProductDTO>> findAll() {
+    public ResponseEntity<FooResponse> findAll() {
         List<ProductDTO> cacheProducts = (List<ProductDTO>) redisTemplate.opsForValue().get("products");
         if (cacheProducts != null && !cacheProducts.isEmpty()) {
             System.out.println("we used the cache" + cacheProducts);
-            return CompletableFuture.completedFuture(cacheProducts);
+            CompletableFuture a = CompletableFuture.completedFuture(cacheProducts);
+            return new ResponseEntity<>(FooResponse.builder().status(true).message("OK").data(a).build(), HttpStatus.OK);
         }
         List<ProductDTO> allProducts = productRepository.findAll().stream().map(productDTOMapper).collect(Collectors.toList());
         redisTemplate.opsForValue().set("products", allProducts);
         System.out.println("we used database");
-        return CompletableFuture.completedFuture(allProducts);
+
+        CompletableFuture b = CompletableFuture.completedFuture(allProducts);
+        return new ResponseEntity<>(FooResponse.builder().status(true).message("OK").data(b).build(), HttpStatus.OK);
     }
 
     @Async
